@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from './components/ui/card';
 
 const PatternEditor = () => {
   const [dimensions, setDimensions] = useState({ width: 32, height: 27 });
