@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Card, CardHeader, CardTitle, CardContent } from './components/ui/card';
+import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 
 const PatternEditor = () => {
   const [dimensions, setDimensions] = useState({ width: 32, height: 27 });
@@ -10,22 +10,28 @@ const PatternEditor = () => {
   const [isDrawing, setIsDrawing] = useState(false);
 
   const colors = {
-    1: { name: 'Blanc', hex: '#FFFFFF' },
-    2: { name: 'Gris clair', hex: '#D3D3D3' },
-    3: { name: 'Gris foncé', hex: '#808080' },
-    4: { name: 'Noir', hex: '#000000' },
-    5: { name: 'Rose', hex: '#FFC0CB' },
-    6: { name: 'Rouge', hex: '#FF0000' },
-    7: { name: 'Orange', hex: '#FFA500' },
-    8: { name: 'Brun', hex: '#964B00' },
-    9: { name: 'Jaune', hex: '#FFD700' },
-    10: { name: 'Vert clair', hex: '#90EE90' },
-    11: { name: 'Vert', hex: '#008000' },
-    12: { name: 'Cyan', hex: '#00FFFF' },
-    13: { name: 'Bleu clair', hex: '#87CEEB' },
-    14: { name: 'Bleu', hex: '#0000FF' },
-    15: { name: 'Bleu foncé', hex: '#000080' },
-    16: { name: 'Violet', hex: '#800080' }
+    1: { name: 'white', rgb: { red: 236, green: 240, blue: 241 } },
+    2: { name: 'lightgray', rgb: { red: 165, green: 180, blue: 190 } },
+    3: { name: 'darkgray', rgb: { red: 105, green: 121, blue: 135 } },
+    4: { name: 'black', rgb: { red: 44, green: 62, blue: 80 } },
+    5: { name: 'pink', rgb: { red: 255, green: 167, blue: 209 } },
+    6: { name: 'red', rgb: { red: 231, green: 76, blue: 60 } },
+    7: { name: 'orange', rgb: { red: 230, green: 126, blue: 34 } },
+    8: { name: 'brown', rgb: { red: 160, green: 106, blue: 66 } },
+    9: { name: 'yellow', rgb: { red: 241, green: 196, blue: 15 } },
+    10: { name: 'lime', rgb: { red: 54, green: 222, blue: 127 } },
+    11: { name: 'green', rgb: { red: 2, green: 162, blue: 1 } },
+    12: { name: 'cyan', rgb: { red: 0, green: 211, blue: 212 } },
+    13: { name: 'blue', rgb: { red: 0, green: 152, blue: 255 } },
+    14: { name: 'indigo', rgb: { red: 0, green: 65, blue: 176 } },
+    15: { name: 'magenta', rgb: { red: 207, green: 110, blue: 228 } },
+    16: { name: 'purple', rgb: { red: 155, green: 28, blue: 182 } },
+    17: { name: 'beige', rgb: { red: 255, green: 224, blue: 180 } },
+    18: { name: 'darkred', rgb: { red: 190, green: 0, blue: 57 } }
+  };
+
+  const getRgbString = (color) => {
+    return `rgb(${color.rgb.red}, ${color.rgb.green}, ${color.rgb.blue})`;
   };
 
   const handleDimensionChange = (dim, value) => {
@@ -34,6 +40,9 @@ const PatternEditor = () => {
       ...prev,
       [dim]: newValue
     }));
+    
+    // Recréer la grille avec les nouvelles dimensions
+    setGrid(Array(newValue).fill().map(() => Array(dimensions.width).fill(null)));
   };
 
   const handleMouseDown = (row, col) => {
@@ -64,7 +73,6 @@ const PatternEditor = () => {
       }
     }
     
-    // Formater le pattern une accolade par ligne
     const formattedPattern = pattern.map(p => `  { x: ${p.x}, y: ${p.y}, color: ${p.color} }`).join(',\n');
     
     return `// Pattern
@@ -76,8 +84,6 @@ ${formattedPattern}
   const clearGrid = () => {
     setGrid(Array(dimensions.height).fill().map(() => Array(dimensions.width).fill(null)));
   };
-
-
 
   const exportDrawing = () => {
     const pattern = [];
@@ -172,23 +178,25 @@ ${formattedPattern}
                   key={id}
                   onClick={() => setSelectedColor(parseInt(id))}
                   className={`w-8 h-8 rounded cursor-pointer flex items-center justify-center ${selectedColor === parseInt(id) ? 'ring-2 ring-blue-500' : ''}`}
-                  style={{ backgroundColor: color.hex }}
+                  style={{ backgroundColor: getRgbString(color) }}
                   title={color.name}
                 >
-                  <span className="text-xs" style={{color: parseInt(id) === 1 ? 'black' : 'white'}}>{id}</span>
+                  <span className="text-xs" style={{
+                    color: parseInt(id) === 1 ? 'black' : 'white'
+                  }}>{id}</span>
                 </div>
               ))}
             </div>
           </div>
 
           <div className="mb-4 flex gap-2">
-            <button onClick={clearGrid} className="px-4 py-2 bg-red-500 text-white rounded">
+            <button onClick={clearGrid} className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600">
               Effacer
             </button>
-            <button onClick={exportDrawing} className="px-4 py-2 bg-green-500 text-white rounded">
+            <button onClick={exportDrawing} className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600">
               Exporter
             </button>
-            <label className="px-4 py-2 bg-purple-500 text-white rounded cursor-pointer">
+            <label className="px-4 py-2 bg-purple-500 text-white rounded cursor-pointer hover:bg-purple-600">
               Importer
               <input
                 type="file"
@@ -206,7 +214,7 @@ ${formattedPattern}
                   <div
                     key={`${i}-${j}`}
                     className="w-6 h-6 border border-gray-200 cursor-pointer"
-                    style={{ backgroundColor: cell !== null ? colors[cell].hex : 'white' }}
+                    style={{ backgroundColor: cell !== null ? getRgbString(colors[cell]) : 'white' }}
                     onMouseDown={() => handleMouseDown(i, j)}
                     onMouseOver={() => handleMouseOver(i, j)}
                   />
